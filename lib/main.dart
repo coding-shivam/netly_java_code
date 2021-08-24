@@ -53,6 +53,24 @@ class NativeStuffState extends State<NativeStuff> {
     });
   }
 
+  Future<void> initFunction() async {
+    String _message;
+    try {
+      final String result =
+          await platformMethodChannel.invokeMethod('initScanner');
+      _message = result;
+    } on PlatformException catch (e) {
+      _message = "Can't do intiScanner native stuff ${e.message}.";
+    }
+    setState(() {
+      exectionget = _message;
+    });
+    print("#########################");
+    print(exectionget);
+    print("#########################");
+  }
+
+  String exectionget = ' ';
   Future<Null> _launchCamera() async {
     print("lunch camera called");
     String _message;
@@ -87,6 +105,20 @@ class NativeStuffState extends State<NativeStuff> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 0.0),
+            //   child: Center(
+            //     child: FlatButton.icon(
+            //       icon: Icon(
+            //         Icons.power_settings_new,
+            //         size: 100,
+            //       ),
+            //       label: Text(''),
+            //       textColor: Colors.white,
+            //       onPressed: _managePower,
+            //     ),
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 0.0),
               child: Center(
@@ -97,10 +129,13 @@ class NativeStuffState extends State<NativeStuff> {
                   ),
                   label: Text(''),
                   textColor: Colors.white,
-                  onPressed: _managePower,
+                  onPressed: initFunction,
                 ),
               ),
             ),
+            // ignore: unnecessary_null_comparison
+            // Text(exectionget == null ? '' : exectionget),
+            Divider(),
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 50.0),
               child: Center(
