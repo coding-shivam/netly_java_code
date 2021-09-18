@@ -30,12 +30,14 @@ import android.widget.TextView;
 
 public class MainActivity extends FlutterActivity implements MFS100Event {
   private static final String CHANNEL = "mychannel";
-  MFS100 mfs100 = null;
+  MFS100 mfs100;
   TextView lblMessage;
   EditText txtEventLog;
+  private FlutterEngine flutterEngine;
 
   @Override
   public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+    this.flutterEngine = flutterEngine;
     GeneratedPluginRegistrant.registerWith(flutterEngine);
 
     new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
@@ -48,6 +50,7 @@ public class MainActivity extends FlutterActivity implements MFS100Event {
             String myMessage = Boolean.toString(deviceStatus);
             result.success(myMessage);
           } else if (call.method.equals("initScanner")) {
+            System.out.println("Init success");
             String deviceStatus = InitScanner();
             String myMessage = deviceStatus;
             result.success(myMessage);
@@ -98,46 +101,220 @@ public class MainActivity extends FlutterActivity implements MFS100Event {
   }
 
   private String InitScanner() {
+
     String myexecption = null;
-    try {
+    // try {
+    // String info = "enter in try bolck";
+    if (mfs100 == null) {
+      // String info = "enter in try bolck mfs100 = null";
+      // myexecption = info;
+
+      mfs100 = new MFS100(this);
+      String info = "enter in try bolck mfs100 = null";
+      myexecption = info;
+
+      // mfs100.SetApplicationContext(context);
+    } else {
       int ret = mfs100.Init();
-      if (ret != 0) {
-        SetTextOnUIThread(mfs100.GetErrorMsg(ret));
-      } else {
-        SetTextOnUIThread("Init success");
-        String info = "Serial: " + mfs100.GetDeviceInfo().SerialNo() + " Make: " + mfs100.GetDeviceInfo().Make()
-            + " Model: " + mfs100.GetDeviceInfo().Model() + "\nCertificate: " + mfs100.GetCertification();
-        SetLogOnUIThread(info);
-        myexecption = info;
-        // print(myexecption);
-      }
-    } catch (Exception e) {
-      StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      String exceptionAsString = sw.toString();
-      System.out.println(exceptionAsString);
-        myexecption = exceptionAsString;
-      // print(myexecption);
-      // Toast.makeText(getApplicationContext(), "Init failed, unhandled exception",
-      // Toast.LENGTH_LONG).show();
-      // SetTextOnUIThread("Init failed, unhandled exception");
+
+      String info = "working every thing good";
+      myexecption = info;
+      //
+      //
+      //
+      //
+      // try {
+      // int ret = mfs100.Init();
+      // System.out.println("HELLO WORLD");
+      // System.out.println(ret);
+      // System.out.println(ret);
+      // System.out.println(ret);
+      // System.out.println(ret);
+      // System.out.println("HELLO INIT");
+      // if (ret != 0) {
+      // SetTextOnUIThread(mfs100.GetErrorMsg(ret));
+      // myexecption = "Init failed, ********* On ret != 0 *********";
+
+      // } else {
+      // SetTextOnUIThread("Init success");
+      // info = "Serial: " + mfs100.GetDeviceInfo().SerialNo() + " Make: " +
+      // mfs100.GetDeviceInfo().Make() + " Model: "
+      // + mfs100.GetDeviceInfo().Model() + "\nCertificate: " +
+      // mfs100.GetCertification();
+      // SetTextOnUIThread(info);
+      // myexecption = info;
+
+      // }
+      // } catch (Exception e) {
+      // System.out.println("HELLO WORLD");
+
+      // StringWriter sw = new StringWriter();
+      // e.printStackTrace(new PrintWriter(sw));
+      // String exceptionAsString = sw.toString();
+      // System.out.println(exceptionAsString);
+      // myexecption = "Init failed, unhandled exception";
+      // // Toast.makeText(context, "Init failed, unhandled exception",
+      // // Toast.LENGTH_LONG).show();
+      // // SetTextOnUIThread("Init failed, unhandled exception");
+      // }
+
     }
+    // } catch (Exception ex) {
+    // String info = "enter in catch bolck";
+    // myexecption = info;
+    // }
+    //
+    //
+    //
+    //
+    //
+    //
+
     return myexecption;
+
   }
 
   @Override
-  public void OnDeviceAttached(int i, int i1, boolean b) {
-    
+  public void OnDeviceAttached(int vid, int pid, boolean hasPermission) {
+
+    int ret;
+    if (!hasPermission) {
+      SetTextOnUIThread("Permission denied");
+      System.out.println("Permission denied");
+
+      return;
+    }
+    if (vid == 1204 || vid == 11279) {
+      if (pid == 34323) {
+        ret = mfs100.LoadFirmware();
+        if (ret != 0) {
+          System.out.println("OnDeviceAttached  ret != 0 ");
+
+          SetTextOnUIThread(mfs100.GetErrorMsg(ret));
+          System.out.println(mfs100.GetErrorMsg(ret));
+
+        } else {
+          SetTextOnUIThread("Load firmware success");
+          System.out.println("Load firmware success");
+
+        }
+      } else if (pid == 4101) {
+        String key = "Without Key";
+        ret = mfs100.Init();
+        if (ret == 0) {
+          showSuccessLog(key);
+        } else {
+          System.out.println("OnDeviceAttached pid == 4101");
+
+          SetTextOnUIThread(mfs100.GetErrorMsg(ret));
+          System.out.println(mfs100.GetErrorMsg(ret));
+
+        }
+
+      }
+    }
   }
 
+  private void showSuccessLog(String key) {
+    SetTextOnUIThread("Init success");
+    System.out.println("Init success");
+
+    String info = "\nKey: " + key + "\nSerial: " + mfs100.GetDeviceInfo().SerialNo() + " Make: "
+        + mfs100.GetDeviceInfo().Make() + " Model: " + mfs100.GetDeviceInfo().Model() + "\nCertificate: "
+        + mfs100.GetCertification();
+    SetTextOnUIThread(info);
+    System.out.println(info);
+
+  }
 
   @Override
   public void OnDeviceDetached() {
+    SetTextOnUIThread("Device removed");
+    System.out.println("Device removed");
 
   }
 
   @Override
   public void OnHostCheckFailed(String s) {
 
+    try {
+      SetTextOnUIThread(s);
+      System.out.println(s);
+
+    } catch (Exception ignored) {
+    }
   }
+
+  // private String InitScanner() {
+  // // mfs100 = new MFS100(this);
+
+  // String myexecption = null;
+  // try {
+  // if (mfs100 == null) {
+  // mfs100 = new MFS100(this);
+  // mfs100.SetApplicationContext(context);
+
+  // // mfs100.SetApplicationContext(MFS100Test.this);
+  // } else {
+  // try {
+  // int ret = mfs100.Init();
+  // System.out.println("HELLO WORLD");
+  // System.out.println(ret);
+  // System.out.println(ret);
+  // System.out.println(ret);
+  // System.out.println(ret);
+  // System.out.println("HELLO SHIVAM");
+
+  // if (ret != 0) {
+  // SetTextOnUIThread(mfs100.GetErrorMsg(ret));
+  // } else {
+  // SetTextOnUIThread("Init success");
+  // String info = "Serial: " + mfs100.GetDeviceInfo().SerialNo() + " Make: " +
+  // mfs100.GetDeviceInfo().Make()
+  // + " Model: " + mfs100.GetDeviceInfo().Model() + "\nCertificate: " +
+  // mfs100.GetCertification();
+  // SetLogOnUIThread(info);
+  // myexecption = info;
+  // // print(myexecption);
+  // }
+  // } catch (Exception e) {
+  // System.out.println("HELLO WORLD");
+
+  // StringWriter sw = new StringWriter();
+  // e.printStackTrace(new PrintWriter(sw));
+  // String exceptionAsString = sw.toString();
+  // System.out.println(exceptionAsString);
+  // myexecption = exceptionAsString;
+  // // print(myexecption);
+  // // Toast.makeText(getApplicationContext(), "Init failed, unhandled
+  // exception",
+  // // Toast.LENGTH_LONG).show();
+  // // SetTextOnUIThread("Init failed, unhandled exception");
+  // }
+  // }
+  // } catch (Exception e) {
+  // System.out.println("HELLO TEST");
+  // StringWriter sw = new StringWriter();
+  // e.printStackTrace(new PrintWriter(sw));
+  // String exceptionAsString = sw.toString();
+  // System.out.println(exceptionAsString);
+  // myexecption = exceptionAsString;
+  // }
+  // return myexecption;
+  // }
+
+  // @Override
+  // public void OnDeviceAttached(int i, int i1, boolean b) {
+
+  // }
+
+  // @Override
+  // public void OnDeviceDetached() {
+
+  // }
+
+  // @Override
+  // public void OnHostCheckFailed(String s) {
+
+  // }
 }

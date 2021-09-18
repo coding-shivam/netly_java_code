@@ -101,7 +101,7 @@ class NativeStuffState extends State<NativeStuff> {
         title: Text("Netly Java Code Run"),
       ),
       body: Container(
-        color: Colors.teal,
+        color: Colors.redAccent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -127,7 +127,7 @@ class NativeStuffState extends State<NativeStuff> {
                     Icons.power_settings_new,
                     size: 100,
                   ),
-                  label: Text(''),
+                  label: Text('init Function'),
                   textColor: Colors.white,
                   onPressed: initFunction,
                 ),
@@ -156,7 +156,7 @@ class NativeStuffState extends State<NativeStuff> {
                     Icons.photo_camera,
                     size: 100,
                   ),
-                  label: Text(''),
+                  label: Text('camera'),
                   textColor: Colors.white,
                   onPressed: _launchCamera,
                 ),
