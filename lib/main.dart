@@ -70,6 +70,22 @@ class NativeStuffState extends State<NativeStuff> {
     print("#########################");
   }
 
+  Future<void> captureFunction() async {
+    String _message;
+    try {
+      final String result = await platformMethodChannel.invokeMethod('capture');
+      _message = result;
+    } on PlatformException catch (e) {
+      _message = "Can't do intiScanner native stuff ${e.message}.";
+    }
+    setState(() {
+      exectionget = _message;
+    });
+    print("#########################");
+    print(exectionget);
+    print("#########################");
+  }
+
   String exectionget = ' ';
   Future<Null> _launchCamera() async {
     print("lunch camera called");
@@ -137,7 +153,26 @@ class NativeStuffState extends State<NativeStuff> {
             // Text(exectionget == null ? '' : exectionget),
             Divider(),
             Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 50.0),
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 0.0),
+              child: Center(
+                child: FlatButton.icon(
+                  icon: Icon(
+                    Icons.power_settings_new,
+                    size: 100,
+                  ),
+                  label: Text('Capture'),
+                  textColor: Colors.white,
+                  onPressed: captureFunction,
+                ),
+              ),
+            ),
+            // ignore: unnecessary_null_comparison
+            // Text(exectionget == null ? '' : exectionget),
+            Divider(),
+            Text(exectionget),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 20.0),
               child: Center(
                 child: Text(
                   nativeMessage,

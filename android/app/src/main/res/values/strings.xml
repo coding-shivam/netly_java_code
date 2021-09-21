@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="MFS100Ver">
+        <item>41</item>
+        <item>31</item>
+    </string-array>
+    <string name="title_activity_preference">Preference</string>
+</resources>
